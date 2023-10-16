@@ -5,6 +5,11 @@ import { Bar } from "react-chartjs-2";
 import { Dna } from "react-loader-spinner";
 // eslint-disable-next-line no-unused-vars
 import Chart from "chart.js/auto";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import { solidDataWiD } from "../../Utils/solidData";
 
 export default function PopulationGrowth() {
   const [deaths, setDeaths] = useState({
@@ -135,13 +140,15 @@ export default function PopulationGrowth() {
   }, [deaths, abortions, births]);
 
   useEffect(() => {
-    const timer =
-      counter >= 0 && setInterval(() => setCounter(counter + 1), 1000);
-    return () => clearInterval(timer);
-  }, [counter]);
+    if (firstValues.deaths && firstValues.abortions && firstValues.births) {
+      const timer =
+        counter >= 0 && setInterval(() => setCounter(counter + 1), 1000);
+      return () => clearInterval(timer);
+    }
+  }, [counter, firstValues]);
 
   return (
-    <div>
+    <div style={{ padding: 16 }}>
       {/* <div style={{ position: "fixed", inset: 0, height: "80%" }}>
         <Tldraw />
       </div> */}
@@ -155,8 +162,6 @@ export default function PopulationGrowth() {
                 position: "absolute",
                 top: "50%",
                 left: "50%",
-                // msTransform: "translate(" - (50 % ", ") - (50 % ")"),
-                // transform: "translate(" - (50 % ", ") - (50 % ")"),
               }}
             >
               <Dna
@@ -175,8 +180,8 @@ export default function PopulationGrowth() {
         !!abortions.abortions_this_year &&
         !!births.births_this_year && (
           <>
-            <div style={{ display: "flex" }}>
-              <div className="chart-container" style={{ width: "50%" }}>
+            <div style={{ display: "flex", flexWrap: "wrap" }}>
+              <div style={{ width: "50%" }}>
                 {/* <h2 style={{ textAlign: "center" }}>Bar Chart</h2> */}
                 <Bar
                   data={chartYearData}
@@ -190,6 +195,7 @@ export default function PopulationGrowth() {
                         display: true,
                       },
                     },
+                    responsive: true,
                     // scales: {
                     //   x: {
                     //     display: true,
@@ -202,7 +208,7 @@ export default function PopulationGrowth() {
                   }}
                 />
               </div>
-              <div className="chart-container" style={{ width: "50%" }}>
+              <div style={{ width: "50%" }}>
                 {/* <h2 style={{ textAlign: "center" }}>Bar Chart</h2> */}
                 <Bar
                   data={chartDayData}
@@ -216,6 +222,7 @@ export default function PopulationGrowth() {
                         display: true,
                       },
                     },
+                    responsive: true,
                     // scales: {
                     //   x: {
                     //     display: true,
@@ -233,19 +240,205 @@ export default function PopulationGrowth() {
               !!firstValues.abortions &&
               !!firstValues.births && (
                 <>
-                  <div>{counter} secondes</div>
-                  <h6>Nombre de morts depuis que vous êtes sur la page : </h6>
-                  <h3>{deaths.deaths_this_year - firstValues.deaths}</h3>
-                  <h6>
-                    Nombre d'avortements depuis que vous êtes sur la page :{" "}
-                  </h6>
-                  <h3>
-                    {abortions.abortions_this_year - firstValues.abortions}
-                  </h3>
-                  <h6>
-                    Nombre de naissance depuis que vous êtes sur la page :{" "}
-                  </h6>
-                  <h3>{births.births_this_year - firstValues.births}</h3>
+                  <Box sx={{ minWidth: 275 }}>
+                    <Card variant="outlined">
+                      <CardContent style={{ textAlign: "center" }}>
+                        <Typography
+                          sx={{ fontSize: 14 }}
+                          color="text.secondary"
+                          gutterBottom
+                        >
+                          Heure de connexion (UTC +2) :
+                        </Typography>
+                        <Typography variant="h5" component="div">
+                          {new Date().toLocaleTimeString("fr-FR")}
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  </Box>
+                  <div style={{ display: "flex", flexWrap: "wrap" }}>
+                    <Box
+                      sx={{
+                        minWidth: 275,
+                        maxWidth: 300,
+                        padding: 4,
+                      }}
+                    >
+                      <Card
+                        variant="outlined"
+                        style={{
+                          minHeight: 120,
+                        }}
+                      >
+                        <CardContent>
+                          <Typography
+                            sx={{ fontSize: 14 }}
+                            color="text.secondary"
+                            gutterBottom
+                          >
+                            Nombre de morts depuis {counter} secondes :
+                          </Typography>
+                          <Typography variant="h5" component="div">
+                            {deaths.deaths_this_year - firstValues.deaths}
+                          </Typography>
+                          {/* <Typography sx={{ mb: 1.5 }} color="text.secondary">
+                        adjective
+                      </Typography>
+                      <Typography variant="body2">
+                        well meaning and kindly.
+                        <br />
+                        {'"a benevolent smile"'}
+                      </Typography>
+                    <CardActions>
+                      <Button size="small">Learn More</Button>
+                    </CardActions> */}
+                        </CardContent>
+                      </Card>
+                    </Box>
+                    <Box sx={{ minWidth: 275, maxWidth: 300, padding: 4 }}>
+                      <Card
+                        variant="outlined"
+                        style={{
+                          minHeight: 120,
+                        }}
+                      >
+                        <CardContent>
+                          <Typography
+                            sx={{ fontSize: 14 }}
+                            color="text.secondary"
+                            gutterBottom
+                          >
+                            Nombre de naissances depuis {counter} secondes :
+                          </Typography>
+                          <Typography variant="h5" component="div">
+                            {births.births_this_year - firstValues.births}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </Box>
+                    <Box sx={{ minWidth: 275, maxWidth: 300, padding: 4 }}>
+                      <Card
+                        variant="outlined"
+                        style={{
+                          minHeight: 120,
+                        }}
+                      >
+                        <CardContent>
+                          <Typography
+                            sx={{ fontSize: 14 }}
+                            color="text.secondary"
+                            gutterBottom
+                          >
+                            Nombre d'avortements depuis {counter} secondes :
+                          </Typography>
+                          <Typography variant="h5" component="div">
+                            {abortions.abortions_this_year -
+                              firstValues.abortions}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </Box>
+                  </div>
+                  <div style={{ display: "flex", flexWrap: "wrap" }}>
+                    <Box sx={{ minWidth: 275, padding: 4 }}>
+                      <Card variant="outlined">
+                        <CardContent style={{ textAlign: "center" }}>
+                          <Typography
+                            sx={{ fontSize: 14 }}
+                            color="text.secondary"
+                            gutterBottom
+                          >
+                            Statistiques des morts par an:
+                          </Typography>
+                          <Typography variant="h5" component="div">
+                            {(
+                              ((deaths.deaths_this_year -
+                                solidDataWiD.deaths[2022]) /
+                                solidDataWiD.deaths[2022]) *
+                              100
+                            ).toFixed(2)}{" "}
+                            % depuis 2022 ({solidDataWiD.deaths[2022]})
+                          </Typography>
+                          <Typography variant="h5" component="div">
+                            {(
+                              ((solidDataWiD.deaths[2022] -
+                                solidDataWiD.deaths[2021]) /
+                                solidDataWiD.deaths[2021]) *
+                              100
+                            ).toFixed(2)}{" "}
+                            % entre 2021 et 2022({solidDataWiD.deaths[2021]})
+                          </Typography>
+                          <Typography variant="h5" component="div">
+                            {(
+                              ((solidDataWiD.deaths[2021] -
+                                solidDataWiD.deaths[2020]) /
+                                solidDataWiD.deaths[2020]) *
+                              100
+                            ).toFixed(2)}{" "}
+                            % entre 2020 et 2021({solidDataWiD.deaths[2020]})
+                          </Typography>
+                          <Typography variant="h5" component="div">
+                            {(
+                              ((solidDataWiD.deaths[2020] -
+                                solidDataWiD.deaths[2019]) /
+                                solidDataWiD.deaths[2019]) *
+                              100
+                            ).toFixed(2)}{" "}
+                            % entre 2019 et 2020({solidDataWiD.deaths[2019]})
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </Box>
+                    <Box sx={{ minWidth: 275, padding: 4 }}>
+                      <Card variant="outlined">
+                        <CardContent style={{ textAlign: "center" }}>
+                          <Typography
+                            sx={{ fontSize: 14 }}
+                            color="text.secondary"
+                            gutterBottom
+                          >
+                            Statistiques des naissances par an:
+                          </Typography>
+                          <Typography variant="h5" component="div">
+                            {(
+                              ((births.births_this_year -
+                                solidDataWiD.births[2022]) /
+                                solidDataWiD.births[2022]) *
+                              100
+                            ).toFixed(2)}{" "}
+                            % depuis 2022 ({solidDataWiD.births[2022]})
+                          </Typography>
+                          <Typography variant="h5" component="div">
+                            {(
+                              ((solidDataWiD.births[2022] -
+                                solidDataWiD.births[2021]) /
+                                solidDataWiD.births[2021]) *
+                              100
+                            ).toFixed(2)}{" "}
+                            % entre 2021 et 2022({solidDataWiD.births[2021]})
+                          </Typography>
+                          <Typography variant="h5" component="div">
+                            {(
+                              ((solidDataWiD.births[2021] -
+                                solidDataWiD.births[2020]) /
+                                solidDataWiD.births[2020]) *
+                              100
+                            ).toFixed(2)}{" "}
+                            % entre 2020 et 2021 ({solidDataWiD.births[2020]})
+                          </Typography>
+                          <Typography variant="h5" component="div">
+                            {(
+                              ((solidDataWiD.births[2020] -
+                                solidDataWiD.births[2019]) /
+                                solidDataWiD.births[2019]) *
+                              100
+                            ).toFixed(2)}{" "}
+                            % entre 2019 et 2020 ({solidDataWiD.births[2019]})
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </Box>
+                  </div>
                 </>
               )}
           </>
