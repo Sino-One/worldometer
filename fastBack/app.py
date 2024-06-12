@@ -6,7 +6,9 @@ import requests
 from selenium import webdriver 
 from selenium.webdriver.common.by import By
 import threading
-import requests
+import requests   
+   
+
 # import redis
 
 # pool = redis.ConnectionPool(host='localhost', port=6379, db=0)
@@ -66,22 +68,26 @@ def getData():
         counterHeaderData.append(counterHeader[i].text.split("\n"))
 
     for i in data:
-        label = i[1].replace(" ", "_").lower()
-        value = i[0].replace(",", "")
-        value = value.replace("$", "")
-        value = value.replace(" tons", "")
-        value = value.replace(" MWh", "")
-        if dataWithLabel.get(label):
-            continue
-        dataWithLabel[label] = int(value)
+        if len(i):
+            value = i[0].replace(",", "")
+            value = value.replace("$", "")
+            value = value.replace(" tons", "")
+            value = value.replace(" MWh", "")
+            if len(i) > 1: 
+                label = i[1].replace(" ", "_").lower()
+                if dataWithLabel.get(label):
+                    continue
+                dataWithLabel[label] = value
 
     for i in counterHeaderData:
-        label = i[1].replace(" ", "_").lower()
-        value = i[0].replace(",", "")
-        value = value.replace("$", "")
-        value = value.replace(" tons", "")
-        value = value.replace(" MWh", "")
-        dataWithLabel[label] = int(value)
+        if len(i):
+            value = i[0].replace(",", "")
+            value = value.replace("$", "")
+            value = value.replace(" tons", "")
+            value = value.replace(" MWh", "")
+            if len(i) > 1: 
+                label = i[1].replace(" ", "_").lower()
+                dataWithLabel[label] = value
 
     # switchElements = driver.find_elements(By.CLASS_NAME, 'settype')
 
@@ -147,14 +153,16 @@ def getOtherData():
         counterHeaderData.append(counterHeader[i].text.split("\n"))
 
     for i in data:
-        label = i[1].replace(" ", "_").lower()
-        value = i[0].replace(",", "")
-        value = value.replace("$", "")
-        value = value.replace(" tons", "")
-        value = value.replace(" MWh", "")
-        if dataWithLabel.get(label):
-            continue
-        dataWithLabel[label] = int(value)
+        if len(i):
+            value = i[0].replace(",", "")
+            value = value.replace("$", "")
+            value = value.replace(" tons", "")
+            value = value.replace(" MWh", "")
+            if len(i) > 1: 
+                label = i[1].replace(" ", "_").lower()
+                if dataWithLabel.get(label):
+                    continue
+                dataWithLabel[label] = value
 
 
     driver.quit()
