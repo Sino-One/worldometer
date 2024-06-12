@@ -21,6 +21,18 @@ data = {}
 def cors_support(response, *args, **kwargs):
     response.set_header('Access-Control-Allow-Origin', '*')
 
+# Définir une fonction pour récupérer un élément en traitant les erreurs StaleElementReferenceException
+def get_element_safe(driver, locator):
+    MAX_RETRIES = 3
+    retries = 0
+    while retries < MAX_RETRIES:
+        try:
+            element = driver.find_element(*locator)
+            return element
+        except StaleElementReferenceException:
+            retries += 1
+    raise StaleElementReferenceException("Impossible de récupérer l'élément après plusieurs tentatives.")
+
 # Fonction pour récupérer les données à partir de la page Web
 def scrape_data():
     try:
@@ -35,22 +47,26 @@ def scrape_data():
         soup = BeautifulSoup(driver.page_source, "html.parser")
         # Extraire les compteurs à partir du contenu HTML
         counters = soup.find_all("div", class_="counter-group")
+        counters.extend(soup.find_all("div", class_="counter-header"))
         global data
         for counter in counters:
-            item = counter.find("span", class_="counter-item")
-            counter_value = counter.find("span", class_="rts-counter")
-            if item and counter_value:
-                key = item.text.strip()
-                value = counter_value.text.strip().replace(",", "")
-                data[key] = value
+            try:
+                item = counter.find("span", class_="counter-item")
+                counter_value = counter.find("span", class_="rts-counter")
+                if item and counter_value:
+                    key = item.text.strip().replace(" ", "_").lower()
+                    value = counter_value.text.strip().replace(",", "")
+                    data[key] = value
+            except Exception as e:
+                print(f"Une erreur s'est produite: {e}")
         # Convertir les données en JSON
         json_data = json.dumps(data, indent=4)
         # Afficher le JSON
         print(json_data)
     except Exception as e:
         print(f"Une erreur s'est produite: {e}")
-
     scrape_other_data()
+
 
 def scrape_other_data():
     try:
@@ -71,13 +87,17 @@ def scrape_other_data():
         soup = BeautifulSoup(driver.page_source, "html.parser")
         # Extraire les compteurs à partir du contenu HTML
         counters = soup.find_all("div", class_="counter-group")
+        counters.extend(soup.find_all("div", class_="counter-header"))
         for counter in counters:
-            item = counter.find("span", class_="counter-item")
-            counter_value = counter.find("span", class_="rts-counter")
-            if item and counter_value:
-                key = item.text.strip()
-                value = counter_value.text.strip().replace(",", "")
-                data[key] = value
+            try:
+                item = counter.find("span", class_="counter-item")
+                counter_value = counter.find("span", class_="rts-counter")
+                if item and counter_value:
+                    key = item.text.strip().replace(" ", "_").lower()
+                    value = counter_value.text.strip().replace(",", "")
+                    data[key] = value
+            except Exception as e:
+                print(f"Une erreur s'est produite: {e}")
         # Convertir les données en JSON
         json_data = json.dumps(data, indent=4)
         # Afficher le JSON
@@ -87,7 +107,7 @@ def scrape_other_data():
 
 # Exécuter la fonction de récupération des données toutes les 10 secondes
 def run_thread():
-    threading.Timer(10.0, run_thread).start()
+    threading.Timer(10.0, run_thread).start()    
     scrape_data()
 
 run_thread()
@@ -98,25 +118,25 @@ def root():
 
 @hug.get('/births', requires=cors_support)
 def births():
-    if ("Births this year" in data and "Births today" in data):
-        return {"Births this year" : data["Births this year"], "Births today" : data["Births today"]}
+    if ("births_this_year" in data and "births_today" in data):
+        return {"births_this_year" : data["births_this_year"], "births_today" : data["births_today"]}
 
 @hug.get('/deaths', requires=cors_support)
 def deaths():
-    if ("Deaths this year" in data and "Deaths today" in data):
-        return {"Deaths this year" : data["Deaths this year"], "Deaths today" : data["Deaths today"]}
+    if ("deaths_this_year" in data and "deaths_today" in data):
+        return {"deaths_this_year" : data["deaths_this_year"], "deaths_today" : data["deaths_today"]}
 
 @hug.get('/abortions', requires=cors_support)
 def abortions():
-    if ("Abortions this year" in data):
-        return {"Abortions this year" : data["Abortions this year"], "Abortions today" : int(data["Abortions this year"]/365)}
+    if ("abortions_this_year" in data):
+        return {"abortions_this_year" : data["abortions_this_year"], "abortions_today" : data["abortions_today"]}
 
 @hug.get('/computers', requires=cors_support)
 def computers():
-    if ("Computers produced today" in data):
-        return {"Computers produced today" : data["Computers produced today"], "Computers produced this year" : int(data["Computers produced this year"])}
+    if ("computers_produced_today" in data):
+        return {"computers_produced_today" : data["computers_produced_today"], "computers_produced_this_year" : data["computers_produced_this_year"]}
 
 @hug.get('/cellular', requires=cors_support)
 def computers():
-    if ("Cellular phones sold this year" in data):
-        return {"Cellular phones sold this year" : data["Cellular phones sold this year"], "Cellular phones sold today" : int(data["Cellular phones sold today"])}
+    if ("cellular_phones_sold_this_year" in data):
+        return {"cellular_phones_sold_this_year" : data["cellular_phones_sold_this_year"], "cellular_phones_sold_today" : data["cellular_phones_sold_today"]}

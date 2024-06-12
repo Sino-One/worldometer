@@ -137,6 +137,7 @@ export default function PopulationGrowth() {
         ? births.births_this_year
         : firstValues.births,
     });
+    console.log(deaths, abortions, births, firstValues);
   }, [deaths, abortions, births]);
 
   useEffect(() => {
