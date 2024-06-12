@@ -5,10 +5,7 @@ export async function getData(options) {
     .request({
       url: `http://localhost:8000/${options}`,
     })
-    .then((res) => {
-      console.log(res);
-      return res;
-    })
+    .then((res) => res)
     .catch(function (error) {
       console.error(error);
     });
